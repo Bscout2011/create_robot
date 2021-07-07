@@ -89,6 +89,7 @@ CreateDriver::CreateDriver(ros::NodeHandle& nh)
   // Set frame_id's
   mode_msg_.header.frame_id = base_frame_;
   bumper_msg_.header.frame_id = base_frame_;
+  cliff_msg_.header.frame_id = base_frame_;
   charging_state_msg_.header.frame_id = base_frame_;
   tf_odom_.header.frame_id = odom_frame_;
   tf_odom_.child_frame_id = base_frame_;
@@ -139,6 +140,7 @@ CreateDriver::CreateDriver(ros::NodeHandle& nh)
   omni_char_pub_ = nh.advertise<std_msgs::UInt16>("ir_omni", 30);
   mode_pub_ = nh.advertise<create_msgs::Mode>("mode", 30);
   bumper_pub_ = nh.advertise<create_msgs::Bumper>("bumper", 30);
+  cliff_pub_ = nh.advertise<create_msgs::Cliff>("cliff", 30);
   wheeldrop_pub_ = nh.advertise<std_msgs::Empty>("wheeldrop", 30);
   wheel_joint_pub_ = nh.advertise<sensor_msgs::JointState>("joint_states", 10);
 
@@ -282,6 +284,7 @@ bool CreateDriver::update()
   publishOmniChar();
   publishMode();
   publishBumperInfo();
+  publishCliffInfo();
   publishWheeldrop();
 
   // If last velocity command was sent longer than latch duration, stop robot
@@ -620,6 +623,27 @@ void CreateDriver::publishBumperInfo()
   }
 
   bumper_pub_.publish(bumper_msg_);
+}
+
+void CreateDriver::publishCliffInfo()
+{
+  cliff_msg_.header.stamp = ros::Time::now();
+
+  if (model_.getVersion() >= create::V_3)
+  {
+    cliff_msg_.is_cliff = robot_->isCliff();
+    cliff_msg_.is_cliff_left = robot_->isCliffLeft();
+    cliff_msg_.is_cliff_front_left = robot_->isCliffFrontLeft();
+    cliff_msg_.is_cliff_right = robot_->isCliffFrontRight();
+    cliff_msg_.is_cliff_front_right = robot_->isCliffRight();
+
+    cliff_msg_.cliff_signal_left = robot_->getLightCliffSignalLeft();
+    cliff_msg_.cliff_signal_front_left = robot_->getLightCliffSignalFrontLeft();
+    cliff_msg_.cliff_signal_front_right = robot_->getLightCliffSignalFrontRight();
+    cliff_msg_.cliff_signal_right = robot_->getLightCliffSignalRight();
+  }
+
+  cliff_pub_.publish(cliff_msg_);
 }
 
 void CreateDriver::publishWheeldrop()

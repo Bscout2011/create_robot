@@ -30,6 +30,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "create_msgs/ChargingState.h"
 #include "create_msgs/Mode.h"
 #include "create_msgs/Bumper.h"
+#include "create_msgs/Cliff.h"
 #include "create_msgs/DefineSong.h"
 #include "create_msgs/PlaySong.h"
 
@@ -96,6 +97,7 @@ private:
   ros::Publisher omni_char_pub_;
   ros::Publisher mode_pub_;
   ros::Publisher bumper_pub_;
+  ros::Publisher cliff_pub_;
   ros::Publisher wheeldrop_pub_;
   ros::Publisher wheel_joint_pub_;
 
@@ -106,6 +108,7 @@ private:
   create_msgs::Mode mode_msg_;
   create_msgs::ChargingState charging_state_msg_;
   create_msgs::Bumper bumper_msg_;
+  create_msgs::Cliff cliff_msg_;
   nav_msgs::Odometry odom_msg_;
   geometry_msgs::TransformStamped tf_odom_;
   ros::Time last_cmd_vel_time_;
@@ -150,6 +153,7 @@ private:
   void publishOmniChar();
   void publishMode();
   void publishBumperInfo();
+  void publishCliffInfo();
   void publishWheeldrop();
 
 public:
